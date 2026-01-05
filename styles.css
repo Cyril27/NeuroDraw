@@ -1,0 +1,113 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  text-align: center;
+  background-color: #f7f9fc;
+  color: #333;
+}
+
+
+.metadata-row {
+  display: flex;
+  justify-content: center; /* centers the pair */
+  gap: 16px;               /* space between first/last name */
+  margin-bottom: 15px;
+}
+
+.metadata-row label {
+  display: flex;
+  flex-direction: column; /* label on top, input below */
+  align-items: center;    /* center text + input */
+}
+
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.tab {
+  padding: 10px 25px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 8px 8px 0 0;
+  background: #e0e4eb;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tab:hover {
+  background: #d4d8e3;
+}
+
+.tab.active {
+  background: #fff;
+  border-bottom: 2px solid #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.tab-content {
+  display: none;
+  border: 1px solid #ccc;
+  border-radius: 0 8px 8px 8px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: opacity 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Canvas */
+.canvas-container {
+  position: relative;
+  margin: 20px auto;
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.canvas-container canvas {
+  display: block;      /* IMPORTANT */
+}
+
+.canvas-container canvas:not(:first-child) {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Optional: smooth transitions for interactive elements */
+button, input, select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+button:hover, input:focus, select:focus {
+  border-color: #888;
+  outline: none;
+}
+
+.clear-btn {
+  margin-bottom: 20px; 
+}
