@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spiral Drawing Pad</title>
+  <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+
+<h1>Spiral Drawing Task</h1>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="meta">Metadata</div>
+  <div class="tab" data-tab="spiral1">Spiral 1</div>
+  <div class="tab" data-tab="spiral2">Spiral 2</div>
+  <div class="tab" data-tab="wave1">Wave 1</div>
+  <div class="tab" data-tab="wave2">Wave 2</div>
+</div>
+
+<button id="saveBtn" type="button" disabled>Save</button>
+
+
+
+<!-- Metadata tab -->
+<div id="meta" class="tab-content active">
+  <h2>Participant Info</h2>
+
+  <div class="metadata-row">
+    <label>
+      First name
+      <input id="first-name" type="text">
+    </label>
+
+    <label>
+      Last name
+      <input id="last-name" type="text">
+    </label>
+  </div>
+
+  <label>Age: <input id="age" type="number" min="0"></label>
+
+  <div class="metadata-row">
+    <span>Sex: </span>
+    <label>
+      <input type="radio" name="sex" value="male">
+      <span>Male</span>
+    </label>
+    <label>
+      <input type="radio" name="sex" value="female">
+      <span>Female</span>
+    </label>
+    <label>
+      <input type="radio" name="sex" value="other">
+      <span>Other</span>
+    </label>
+  </div>
+
+  <div class="metadata-row">
+    <span>Stage: </span>
+    <label>
+      <input type="radio" name="stage" value="0">
+      <span>0</span>
+    </label>
+    <label>
+      <input type="radio" name="stage" value="1">
+      <span>1</span>
+    </label>
+    <label>
+      <input type="radio" name="stage" value="2">
+      <span>2</span>
+    </label>
+    <label>
+      <input type="radio" name="stage" value="3">
+      <span>3</span>
+    </label>
+    <label>
+      <input type="radio" name="stage" value="4">
+      <span>4</span>
+    </label>
+    <label>
+      <input type="radio" name="stage" value="5">
+      <span>5</span>
+    </label>
+  </div>
+
+  <div class="metadata-row">
+    <span>Writing Hand: </span>
+    <label>
+      <input type="radio" name="writing-hand" value="left">
+      <span>Left</span>
+    </label>
+    <label>
+      <input type="radio" name="writing-hand" value="right">
+      <span>Right</span>
+    </label>
+    <label>
+      <input type="radio" name="writing-hand" value="ambidextrous">
+      <span>Ambidextrous</span>
+    </label>
+  </div>
+
+  <div class="metadata-row">
+    <span>Smoker: </span>
+    <label>
+      <input type="radio" name="smoker" value="true">
+      <span>Yes</span>
+    </label>
+    <label>
+      <input type="radio" name="smoker" value="false">
+      <span>No</span>
+    </label>
+  </div>
+
+
+
+  <br>
+  <button class="next-btn" data-next="spiral1">Next</button>
+</div>
+
+<!-- Spiral 1 -->
+<div id="spiral1" class="tab-content">
+  <h2>Spiral 1</h2>  
+  <div class="canvas-container">
+    <canvas id="template_spiral1" width="400" height="400"></canvas>
+    <canvas id="canvas_spiral1" width="400" height="400"></canvas>
+  </div>
+  <br>
+  <button class="clear-btn" data-canvas="canvas_spiral1">Clear</button>
+  <br>
+  <button class="previous-btn" data-next="meta">Previous</button>
+  <button class="next-btn" data-next="spiral2">Next</button>
+  
+</div>
+
+<!-- Spiral 2 -->
+<div id="spiral2" class="tab-content">
+  <h2>Spiral 2</h2>
+  <div class="canvas-container">
+    <canvas id="template_spiral2" width="400" height="400"></canvas>
+    <canvas id="canvas_spiral2" width="400" height="400"></canvas>
+  </div>
+  <br>
+  <button class="clear-btn" data-canvas="canvas_spiral2">Clear</button>
+  <br>
+  <button class="previous-btn" data-next="spiral1">Previous</button>
+  <button class="next-btn" data-next="wave1">Next</button>
+</div>
+
+<!-- Wave 1 -->
+<div id="wave1" class="tab-content">
+  <h2>Wave 1</h2>
+  <div class="canvas-container">
+    <canvas id="template_wave1" width="700" height="400"></canvas>
+    <canvas id="canvas_wave1" width="700" height="400"></canvas>
+  </div>
+  <br>
+  <button class="clear-btn" data-canvas="canvas_wave1">Clear</button>
+  <br>
+  <button class="previous-btn" data-next="spiral2">Previous</button>
+  <button class="next-btn" data-next="wave2">Next</button>
+</div>
+
+<!-- Wave 2 -->
+<div id="wave2" class="tab-content">
+  <h2>Wave 2</h2>
+  <div class="canvas-container">
+    <canvas id="template_wave2" width="700" height="400"></canvas>
+    <canvas id="canvas_wave2" width="700" height="400"></canvas>
+  </div>
+  <br>
+  <button class="clear-btn" data-canvas="canvas_wave2">Clear</button>
+  <br>
+  <button class="previous-btn" data-next="wave1">Previous</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="../src/js/main.js"></script>
+
+</body>
+</html>
