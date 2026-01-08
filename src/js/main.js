@@ -1,73 +1,18 @@
 import { supabaseClient } from "./setup/supabase.js";
-
 import { openTab } from "./ui/tabs.js"; 
 
 import { getPressure } from "./utils/pressure.js";
-
 import { mean, std } from "./utils/math.js";
 
 
 import { setupCanvas, clearCanvas } from "./canvas/drawing.js";
-
-
-
 import { canvasDrawn, canvasDirty } from "./setup/canvasState.js";
-
-
 import { loadTemplate } from "./canvas/templates.js";
+
 
 import { updateSaveButton } from "./ui/saveButton.js";
 
 /* ---------- Save ---------- */
-function downloadImage(canvas, filename) {
-  const link = document.createElement("a");
-  link.download = filename;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
-}
-
-async function savePatientMetadata(first_name, last_name, age, sex, stage, smoker, writing_hand, timestamp) {
-  try {
-    // Convert timestamp format to ISO 8601
-    const [date, time] = timestamp.split("-");
-    const [year, month, day] = date.split("_");
-    const [hours, minutes, seconds] = time.split("_");
-    const isoTimestamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-
-    const { data, error } = await supabaseClient
-      .from("patients")
-      .insert([
-        {
-          first_name: first_name,
-          last_name: last_name,
-          age: parseInt(age),
-          sex: sex,
-          stage: parseInt(stage),
-          smoker: smoker,
-          writing_hand: writing_hand,
-          timestamp: isoTimestamp
-        }
-      ])
-      .select();
-
-    if (error) throw error;
-    alert("Metadata saved to Supabase!");
-    return data[0].id; // Extract and return the patient ID
-  } catch (error) {
-    console.error("Error saving to Supabase:", error.message);
-    alert("Error saving metadata: " + error.message);
-    return null;
-  }
-}
-
-function canvasToBlob(canvas) {
-  return new Promise(resolve => {
-    canvas.toBlob(blob => {
-      resolve(blob);
-    }, "image/png");
-  });
-}
-
 
 async function saveDrawingRow(patientId, canvas, drawingType) {
   const { data, error } = await supabaseClient
@@ -120,9 +65,6 @@ function canSave() {
     Object.values(canvasDrawn).every(Boolean)
   );
 }
-
-
-
 
 
 async function getOrCreatePatient(first_name, last_name, age, sex, stage, smoker, writing_hand) {
