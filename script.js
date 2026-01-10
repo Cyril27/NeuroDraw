@@ -437,10 +437,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCanvas(document.getElementById("canvas_wave2"));
 
   // Load templates
-  loadTemplate("template_spiral1", "../templates/spiral_template.png");
-  loadTemplate("template_spiral2", "../templates/spiral_template.png");
-  loadTemplate("template_wave1", "../templates/wave_template.png");
-  loadTemplate("template_wave2", "../templates/wave_template.png");
+  loadTemplate("template_spiral1", "./templates/spiral_template.png");
+  loadTemplate("template_spiral2", "./templates/spiral_template.png");
+  loadTemplate("template_wave1", "./templates/wave_template.png");
+  loadTemplate("template_wave2", "./templates/wave_template.png");
 
   // Setup tab switching
   document.querySelectorAll(".tab").forEach(tab => {
