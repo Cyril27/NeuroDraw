@@ -4,11 +4,29 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ---------- Tabs ---------- */
-import { openTab } from "./Tabs.js";
+function openTab(id) {
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
-/* ---------- Pressure ---------- */
+  document.getElementById(id).classList.add("active");
+  document.querySelector(`[data-tab="${id}"]`).classList.add("active");
+}
 
-import { getPressure } from "./Pressure.js";
+
+function getPressure(e) {
+  // Pointer Events (mouse, pen, some touch)
+  if (e.pressure !== undefined && e.pressure !== 0) {
+    return e.pressure;
+  }
+
+  // iOS Touch Events
+  if (e.touches && e.touches[0]?.force !== undefined) {
+    return e.touches[0].force || 0.5;
+  }
+
+  // Fallback
+  return 0.5;
+}
 
 
 
