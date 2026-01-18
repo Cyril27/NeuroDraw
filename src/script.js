@@ -4,28 +4,43 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ---------- Tabs ---------- */
-function openTab(id) {
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-
-  document.getElementById(id).classList.add("active");
-  document.querySelector(`[data-tab="${id}"]`).classList.add("active");
-}
+import { openTab } from "./ui/tabs.js";
+/* ---------- Utils ---------- */
+import { getPressure } from "./utils/pressure.js";
+import { mean } from "./utils/math.js";
 
 
-import { getPressure } from "./math/pressure.js";
+
+import { initTremor } from "./utils/tremor.js";
+
+initTremor({
+  startBtnId: "start-tremor-btn",
+  magElId: "tremor-mag",
+  countdownId: "tremor-countdown",
+  plotCanvasId: "tremor-plot"
+});
 
 
-function mean(arr) {
-  return arr.reduce((a, b) => a + b, 0) / arr.length;
-}
 
-function std(arr) {
-  const m = mean(arr);
-  return Math.sqrt(
-    arr.reduce((sum, x) => sum + (x - m) ** 2, 0) / arr.length
-  );
-}
+
+import { initHandVideo, startHandRecording } from "./utils/hand_video.js";
+
+initHandVideo({
+  videoId: "hand-video",
+  canvasId: "hand-canvas",
+  countdownId: "hand-countdown",
+  plotCanvasId: "hand-video-plot"
+});
+
+document
+  .getElementById("start-hand-video-btn")
+  .addEventListener("click", startHandRecording);
+
+
+
+
+
+
 
 
 /* ---------- Drawing ---------- */
@@ -60,23 +75,6 @@ function setupCanvas(canvas) {
       y: e.clientY - rect.top
     };
   }
-
-  function getVelocity(e, lastPos, lastTime) {
-    const currentTime = Date.now();
-    const deltaTime = currentTime - lastTime;
-    console.log("Delta Time:", deltaTime);
-
-    const { x, y } = getPos(e);
-    const deltaX = x - lastPos.x;
-    const deltaY = y - lastPos.y;
-    const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-
-    const velocity = distance / (deltaTime || 1); // pixels per ms
-
-    return { velocity, currentTime, currentPos: { x, y } };
-  }
-
-
 
 
   function startDraw(e) {
@@ -160,29 +158,9 @@ function clearCanvas(canvasId) {
 }
 
 
-const canvasDrawn = {
-  canvas_spiral1: false,
-  canvas_spiral2: false,
-  canvas_wave1: false,
-  canvas_wave2: false
-};
+import { canvasDrawn, canvasDirty } from "./canvas/state.js";
 
-const canvasDirty = {
-  canvas_spiral1: false,
-  canvas_spiral2: false,
-  canvas_wave1: false,
-  canvas_wave2: false
-};
 
-function isCanvasEmpty(canvas) {
-  const ctx = canvas.getContext("2d");
-  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  return !pixels.some(value => value !== 0);
-}
-
-function markCanvasUsed() {
-  updateSaveButton();
-}
 
 function loadTemplate(canvasId, imagePath) {
   const canvas = document.getElementById(canvasId);
@@ -196,56 +174,6 @@ function loadTemplate(canvasId, imagePath) {
 }
 
 /* ---------- Save ---------- */
-function downloadImage(canvas, filename) {
-  const link = document.createElement("a");
-  link.download = filename;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
-}
-
-async function savePatientMetadata(first_name, last_name, age, sex, stage, smoker, writing_hand, timestamp) {
-  try {
-    // Convert timestamp format to ISO 8601
-    const [date, time] = timestamp.split("-");
-    const [year, month, day] = date.split("_");
-    const [hours, minutes, seconds] = time.split("_");
-    const isoTimestamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-
-    const { data, error } = await supabaseClient
-      .from("patients")
-      .insert([
-        {
-          first_name: first_name,
-          last_name: last_name,
-          age: parseInt(age),
-          sex: sex,
-          stage: parseInt(stage),
-          smoker: smoker,
-          writing_hand: writing_hand,
-          timestamp: isoTimestamp
-        }
-      ])
-      .select();
-
-    if (error) throw error;
-    alert("Metadata saved to Supabase!");
-    return data[0].id; // Extract and return the patient ID
-  } catch (error) {
-    console.error("Error saving to Supabase:", error.message);
-    alert("Error saving metadata: " + error.message);
-    return null;
-  }
-}
-
-function canvasToBlob(canvas) {
-  return new Promise(resolve => {
-    canvas.toBlob(blob => {
-      resolve(blob);
-    }, "image/png");
-  });
-}
-
-
 async function saveDrawingRow(patientId, canvas, drawingType) {
   const { data, error } = await supabaseClient
     .from(drawingType + "s")
@@ -285,24 +213,7 @@ async function uploadDrawingImage(drawingId, canvas, drawingType) {
 
 
 
-function canSave() {
-  return (
-    document.getElementById("first-name").value.trim() &&
-    document.getElementById("last-name").value.trim() &&
-    document.getElementById("age").value &&
-    document.querySelector('input[name="sex"]:checked') &&
-    document.querySelector('input[name="stage"]:checked') &&
-    document.querySelector('input[name="smoker"]:checked') &&
-    document.querySelector('input[name="writing-hand"]:checked') &&
-    Object.values(canvasDrawn).every(Boolean)
-  );
-}
-
-
-function updateSaveButton() {
-  const saveBtn = document.getElementById("saveBtn");
-  saveBtn.disabled = !canSave();
-}
+import { updateSaveButton } from "./ui/saveButton.js";
 
 
 

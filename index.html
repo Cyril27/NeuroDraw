@@ -16,6 +16,9 @@
   <div class="tab" data-tab="spiral2">Spiral 2</div>
   <div class="tab" data-tab="wave1">Wave 1</div>
   <div class="tab" data-tab="wave2">Wave 2</div>
+  <div class="tab" data-tab="tremor">Tremor</div>
+  <div class="tab" data-tab="hand_vid">Hand Video</div>
+
 </div>
 
 <button id="saveBtn" type="button" disabled>Save</button>
@@ -174,6 +177,48 @@
   <button class="previous-btn" data-next="wave1">Previous</button>
 </div>
 
+
+<!-- Tremor -->
+<div id="tremor" class="tab-content">
+  <h2>Tremor</h2>
+
+  <div class="metadata-row">
+    <button id="start-tremor-btn" class="start-btn">Start</button>
+    <button id="stop-tremor-btn" class="start-btn">Stop</button>
+    <p id="tremor-countdown" style="font-size:18px; font-weight:bold;"></p>
+  </div>
+  <div>Tremor magnitude: <span id="tremor-mag">0</span></div>
+  <canvas id="tremor-plot" width="600" height="200" style="border:1px solid #ccc;"></canvas>
+
+</div>
+
+<!-- Hand Video -->
+<div id="hand_vid" class="tab-content">
+  <h2>Hand Video</h2>
+  <div class="metadata-row">
+    <button id="start-hand-video-btn" class="start-btn">Start</button>
+    <p id="hand-countdown" style="font-size:18px; font-weight:bold;"></p>
+  </div>
+
+
+  <div class="metadata-row">
+    <div style="position: relative; width: 600px; height: 400px;">
+      <video id="hand-video" width="600" height="400" autoplay playsinline></video>
+      <canvas id="hand-canvas"
+              width="600"
+              height="400"
+              style="position:absolute; top:0; left:0;">
+      </canvas>
+    </div>
+
+    <canvas id="hand-video-plot" width="600" height="200" style="border:1px solid #ccc;"></canvas>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module" src="./src/script.js"></script>
 
