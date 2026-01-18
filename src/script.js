@@ -1,19 +1,179 @@
-import { supabaseClient } from "./setup/supabase.js";
-import { openTab } from "./ui/tabs.js"; 
+// Supabase client
+const SUPABASE_URL = "https://fzgljqihruhafuqxvduy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6Z2xqcWlocnVoYWZ1cXh2ZHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzkyNjMsImV4cCI6MjA4MjUxNTI2M30.Wz0f7Ss7rosusVAumaa1e1LenvNc4d5a6DGVfYQlTm0";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* ---------- Tabs ---------- */
+import { openTab } from "./ui/tabs.js";
+/* ---------- Utils ---------- */
 import { getPressure } from "./utils/pressure.js";
-import { mean, std } from "./utils/math.js";
+import { mean } from "./utils/math.js";
 
 
-import { setupCanvas, clearCanvas } from "./canvas/drawing.js";
-import { canvasDrawn, canvasDirty } from "./setup/canvasState.js";
-import { loadTemplate } from "./canvas/templates.js";
+
+import { initTremor } from "./utils/tremor.js";
+
+initTremor({
+  startBtnId: "start-tremor-btn",
+  magElId: "tremor-mag",
+  countdownId: "tremor-countdown",
+  plotCanvasId: "tremor-plot"
+});
 
 
-import { updateSaveButton } from "./ui/saveButton.js";
+
+
+import { initHandVideo, startHandRecording } from "./utils/hand_video.js";
+
+initHandVideo({
+  videoId: "hand-video",
+  canvasId: "hand-canvas",
+  countdownId: "hand-countdown",
+  plotCanvasId: "hand-video-plot"
+});
+
+document
+  .getElementById("start-hand-video-btn")
+  .addEventListener("click", startHandRecording);
+
+
+
+
+
+
+
+
+/* ---------- Drawing ---------- */
+function setupCanvas(canvas) {
+  const ctx = canvas.getContext("2d");
+  ctx.lineWidth = 1;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "black";
+
+  let drawing = false;
+  let start_time = 0;
+  let reset_draw = false;
+  
+  canvas.drawingData = {
+    positions: [],
+    times: [],
+    pressures: []
+  };
+
+
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+
+
+  function startDraw(e) {
+    if (reset_draw) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      reset_draw = false;
+    }
+
+    drawing = true;
+    start_time = Date.now();
+    canvas.drawingData.positions = [];
+    canvas.drawingData.times = [];
+    canvas.drawingData.pressures = [];
+
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+
+    const pos = getPos(e);
+    const t = Date.now() - start_time;
+    const p = getPressure(e);
+
+    canvas.drawingData.positions.push(pos);
+    canvas.drawingData.times.push(t);
+    canvas.drawingData.pressures.push(p);
+
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+
+
+  function endDraw() {
+
+    if (!drawing) return;
+
+    canvasDrawn[canvas.id] = true;
+    canvasDirty[canvas.id] = true;
+    updateSaveButton();
+
+    drawing = false;
+    reset_draw = true;
+
+    const end_time = Date.now();
+    const duration = end_time - start_time;
+
+   
+
+    console.log(`Drawing duration: ${duration} ms`);
+    console.log('time list:', canvas.drawingData.times);
+    console.log('position list:', canvas.drawingData.positions);
+    
+  }
+
+  // Mouse
+  canvas.addEventListener("mousedown", startDraw);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", endDraw);
+  canvas.addEventListener("mouseleave", endDraw);
+
+  // Touch
+  canvas.addEventListener("touchstart", startDraw);
+  canvas.addEventListener("touchmove", e => {
+    draw(e);
+    e.preventDefault();
+  });
+  canvas.addEventListener("touchend", endDraw);
+  
+}
+
+
+
+function clearCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+  canvasDrawn[canvasId] = false;
+  updateSaveButton();
+}
+
+
+import { canvasDrawn, canvasDirty } from "./canvas/state.js";
+
+
+
+function loadTemplate(canvasId, imagePath) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  img.src = imagePath;
+  img.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+}
 
 /* ---------- Save ---------- */
-
 async function saveDrawingRow(patientId, canvas, drawingType) {
   const { data, error } = await supabaseClient
     .from(drawingType + "s")
@@ -53,18 +213,8 @@ async function uploadDrawingImage(drawingId, canvas, drawingType) {
 
 
 
-function canSave() {
-  return (
-    document.getElementById("first-name").value.trim() &&
-    document.getElementById("last-name").value.trim() &&
-    document.getElementById("age").value &&
-    document.querySelector('input[name="sex"]:checked') &&
-    document.querySelector('input[name="stage"]:checked') &&
-    document.querySelector('input[name="smoker"]:checked') &&
-    document.querySelector('input[name="writing-hand"]:checked') &&
-    Object.values(canvasDrawn).every(Boolean)
-  );
-}
+import { updateSaveButton } from "./ui/saveButton.js";
+
 
 
 async function getOrCreatePatient(first_name, last_name, age, sex, stage, smoker, writing_hand) {
@@ -184,10 +334,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCanvas(document.getElementById("canvas_wave2"));
 
   // Load templates
-  loadTemplate("template_spiral1", "spiral_template.png");
-  loadTemplate("template_spiral2", "spiral_template.png");
-  loadTemplate("template_wave1", "wave_template.png");
-  loadTemplate("template_wave2", "wave_template.png");
+  loadTemplate("template_spiral1", "./templates/spiral_template.png");
+  loadTemplate("template_spiral2", "./templates/spiral_template.png");
+  loadTemplate("template_wave1", "./templates/wave_template.png");
+  loadTemplate("template_wave2", "./templates/wave_template.png");
 
   // Setup tab switching
   document.querySelectorAll(".tab").forEach(tab => {
