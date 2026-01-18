@@ -13,21 +13,7 @@ function openTab(id) {
 }
 
 
-function getPressure(e) {
-  // Pointer Events (mouse, pen, some touch)
-  if (e.pressure !== undefined && e.pressure !== 0) {
-    return e.pressure;
-  }
-
-  // iOS Touch Events
-  if (e.touches && e.touches[0]?.force !== undefined) {
-    return e.touches[0].force || 0.5;
-  }
-
-  // Fallback
-  return 0.5;
-}
-
+import { getPressure } from "./math/pressure.js";
 
 
 function mean(arr) {
@@ -437,10 +423,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCanvas(document.getElementById("canvas_wave2"));
 
   // Load templates
-  loadTemplate("template_spiral1", "templates/spiral_template.png");
-  loadTemplate("template_spiral2", "templates/spiral_template.png");
-  loadTemplate("template_wave1", "templates/wave_template.png");
-  loadTemplate("template_wave2", "templates/wave_template.png");
+  loadTemplate("template_spiral1", "./templates/spiral_template.png");
+  loadTemplate("template_spiral2", "./templates/spiral_template.png");
+  loadTemplate("template_wave1", "./templates/wave_template.png");
+  loadTemplate("template_wave2", "./templates/wave_template.png");
 
   // Setup tab switching
   document.querySelectorAll(".tab").forEach(tab => {
